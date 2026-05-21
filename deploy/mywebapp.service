@@ -1,0 +1,16 @@
+[Unit]
+Description=mywebapp
+Requires=mywebapp.socket
+After=network.target mariadb.service
+
+[Service]
+User=app
+Group=app
+WorkingDirectory=/opt/mywebapp
+ExecStartPre=/opt/mywebapp/venv/bin/python /opt/mywebapp/migrate.py --db-host=127.0.0.1 --db-user=app_user --db-pass=12345678 --db-name=mywebapp
+ExecStart=/opt/mywebapp/venv/bin/python /opt/mywebapp/start.py --db-host=127.0.0.1 --db-user=app_user --db-pass=12345678 --db-name=mywebapp --port=8000
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
