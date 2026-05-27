@@ -1,0 +1,19 @@
+[Unit]
+Description=MyWebApp Docker Container
+Requires=docker.service
+After=docker.service mariadb.service network.target
+
+[Service]
+Restart=always
+TimeoutStartSec=0
+ExecStartPre=-/usr/bin/docker stop mywebapp
+ExecStartPre=-/usr/bin/docker rm mywebapp
+EnvironmentFile=/opt/mywebapp/.env
+ExecStartPre=/usr/bin/docker pull ghcr.io/${GH_USER}/mywebapp:${IMAGE_TAG}
+ExecStart=/usr/bin/docker run --name mywebapp --network host \
+    ghcr.io/${GH_USER}/mywebapp:${IMAGE_TAG} \
+    --db-host=127.0.0.1 --db-user=app_user --db-pass=12345678 --db-name=mywebapp --port=8000
+ExecStop=/usr/bin/docker stop mywebapp
+
+[Install]
+WantedBy=multi-user.target
